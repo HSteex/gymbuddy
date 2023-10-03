@@ -13,16 +13,18 @@ import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.res.colorResource
 import androidx.core.view.WindowCompat
+import com.example.gymbuddy.R
 
 private val DarkColorScheme = darkColorScheme(
-        primary = Purple80,
+        primary = MainBlue,
         secondary = PurpleGrey80,
         tertiary = Pink80
 )
 
 private val LightColorScheme = lightColorScheme(
-        primary = Purple40,
+        primary = MainBlue,
         secondary = PurpleGrey40,
         tertiary = Pink40
 
