@@ -12,17 +12,29 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+
+
 import androidx.compose.foundation.layout.Column
+
 import androidx.compose.foundation.layout.Row
+
+import androidx.compose.foundation.layout.fillMaxHeight
+
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FabPosition
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -45,9 +57,11 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.ReportFragment.Companion.reportFragment
 import com.example.gymbuddy.ui.theme.GymBuddyTheme
 
 
@@ -62,25 +76,35 @@ class MainActivity : ComponentActivity() {
                 //Create a scaffold with a top bar and a floating action button
                 Scaffold (
                     topBar = {
-                        TopAppBar(
-
-                            title = { Text(text = "GymBuddy") },
-                            colors = TopAppBarDefaults.mediumTopAppBarColors(
-                                containerColor = colorResource(id = R.color.main_blue),
-                            ),
+                        CenterAlignedTopAppBar(
+                            title = {
+                                    androidx.compose.foundation.Image(
+                                        painter = painterResource(id = R.drawable.logo_topbar),
+                                        contentDescription = null,
+                                        modifier= Modifier.height(50.dp)
+                                    )
+                            },
+                                colors = TopAppBarDefaults.mediumTopAppBarColors(
+                                    containerColor = colorResource(id = R.color.main_blue_dark),
+                                ),
                             )
                     },
                     floatingActionButton = {
                         AddButton()
                     },
+                    floatingActionButtonPosition = FabPosition.Center,
                     content = { innerPadding ->
                         Surface(
                             modifier = Modifier
                                 .fillMaxSize()
                                 .padding(innerPadding), color = MaterialTheme.colorScheme.background)
                         {
-                            Column {
-                                SchedaEsercizio(titolo = "Titolo 1", descrizione = "Allenamento per spalle e petto, distruzione assicurata", numeroEsercizi = 10)
+                            Column (modifier=Modifier.verticalScroll(rememberScrollState())) {
+                                SchedaEsercizio(titolo = "Titolo 1", descrizione = "Allenamento per spalle e petto, distruzione assicurata poi scrivo cose a caso per testare sto robo e vediamo se taglia bene qujando arriva a 3 righe perchè ho messo cosi e mi iace", numeroEsercizi = 10)
+                                SchedaEsercizio(titolo = "Titolo 2", descrizione = "Allenamento per spalle e petto, distruzione assicurata poi scrivo cose a caso per testare sto robo e vediamo se taglia bene qujando arriva a 3 righe perchè ho messo cosi e mi iace", numeroEsercizi = 10)
+                                SchedaEsercizio(titolo = "Titolo 1", descrizione = "Allenamento per spalle e petto, distruzione assicurata poi scrivo cose a caso per testare sto robo e vediamo se taglia bene qujando arriva a 3 righe perchè ho messo cosi e mi iace", numeroEsercizi = 10)
+                                SchedaEsercizio(titolo = "Titolo 1", descrizione = "Allenamento per spalle e petto, distruzione assicurata poi scrivo cose a caso per testare sto robo e vediamo se taglia bene qujando arriva a 3 righe perchè ho messo cosi e mi iace", numeroEsercizi = 10)
+
                             }
                         }
                     }
@@ -92,7 +116,11 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun AddButton(){
-    FloatingActionButton(onClick = { /*TODO*/}) {
+    FloatingActionButton(
+        onClick = { /*TODO*/},
+        shape= CircleShape,
+        )
+        {
         Icon(Icons.Default.Add, contentDescription = "Add")
     }
 }
@@ -117,8 +145,10 @@ fun SchedaEsercizio(titolo: String = "Titolo", descrizione: String ="Nessuna des
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold)
                 Text(text = descrizione,
-                    maxLines = 3,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
                     )
+
                 InfoRow(icon = painterResource(id = R.drawable.dumbbell_solid), mainText = "Numero esercizi" , value = numeroEsercizi.toString() )
                 InfoRow(icon = painterResource(id = R.drawable.calendar), mainText = "Ultimo allenamento", value = "22/05/2023")
 
