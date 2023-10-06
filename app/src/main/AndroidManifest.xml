@@ -12,6 +12,12 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.GymBuddy"
         tools:targetApi="31">
+
+        <activity
+            android:name=".SchedaEsercizi"
+            android:exported="false"
+            android:label="@string/title_activity_scheda_esercizi"
+            android:theme="@style/Theme.GymBuddy" />
         <activity
             android:name=".MainActivity"
             android:exported="true"

@@ -10,6 +10,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 
@@ -17,6 +18,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 
 import androidx.compose.foundation.layout.fillMaxHeight
 
@@ -32,6 +34,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FabPosition
@@ -45,8 +48,13 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarColors
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
@@ -54,18 +62,23 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.VerticalAlignmentLine
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ReportFragment.Companion.reportFragment
 import com.example.gymbuddy.ui.theme.GymBuddyTheme
+import com.example.gymbuddy.ui.theme.ui.theme.schedaBlue
+import com.example.gymbuddy.ui.theme.ui.theme.schedaTitle
 
 
 class MainActivity : ComponentActivity() {
+
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -74,7 +87,12 @@ class MainActivity : ComponentActivity() {
             GymBuddyTheme {
                 // A surface container using the 'background' color from the theme
                 //Create a scaffold with a top bar and a floating action button
+                var blurDialog by remember { mutableStateOf(0.dp) }
                 Scaffold (
+                    modifier= Modifier
+                        .fillMaxSize()
+                        .blur(blurDialog),
+
                     topBar = {
                         CenterAlignedTopAppBar(
                             title = {
@@ -90,7 +108,9 @@ class MainActivity : ComponentActivity() {
                             )
                     },
                     floatingActionButton = {
-                        AddButton()
+                        AddButton(
+                            addBlur = { blurDialog = it }
+                        )
                     },
                     floatingActionButtonPosition = FabPosition.Center,
                     content = { innerPadding ->
@@ -115,9 +135,21 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun AddButton(){
+fun AddButton(
+    addBlur : (Dp) -> Unit = { },
+)
+{
+    val showDialog = remember { mutableStateOf(false) }
+    if (showDialog.value) {
+        addBlur(10.dp)
+        AddDialogChoice(
+            showDialog = showDialog.value,
+            onDismissRequest = {
+                showDialog.value = false
+                addBlur(0.dp)})
+    }
     FloatingActionButton(
-        onClick = { /*TODO*/},
+        onClick = {showDialog.value = true},
         shape= CircleShape,
         )
         {
@@ -142,8 +174,7 @@ fun SchedaEsercizio(titolo: String = "Titolo", descrizione: String ="Nessuna des
 
                 Text(
                     text = titolo,
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold)
+                    style = schedaTitle)
                 Text(text = descrizione,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis
@@ -180,7 +211,7 @@ fun InfoRow(icon : Painter, mainText: String, value : String){
                 modifier=Modifier.padding(start = 4.dp),
                 fontWeight = FontWeight.Bold,
                 fontSize = 18.sp,
-                style = TextStyle(color= colorResource(id = R.color.main_blue))
+                style = schedaBlue
             )
         }
         Text(text = value,
@@ -189,6 +220,83 @@ fun InfoRow(icon : Painter, mainText: String, value : String){
     }
 }
 
+@Composable
+fun AddDialogChoice(
+    showDialog: Boolean,
+    onDismissRequest: () -> Unit,
+
+) {
+    if (showDialog) {
+        AlertDialog(
+            modifier=Modifier.shadow(
+                elevation = 10.dp,
+                shape = RoundedCornerShape(8.dp)
+            ),
+            onDismissRequest = onDismissRequest,
+            confirmButton = { /*TODO*/ },
+            title = {
+                Text(text = stringResource(R.string.aggiungi_scheda),
+                    style= schedaTitle)
+            },
+            text =
+            {
+                Column {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    DialogSelection(
+                        icon = painterResource(id = R.drawable.plus_solid),
+                        text = stringResource(R.string.nuova_scheda)
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                    DialogSelection(
+                        icon = painterResource(id = R.drawable.qrcode_solid),
+                        text = stringResource(R.string.scansiona_qr_code)
+                    )
+                }
+            },
+            dismissButton = {
+                Text(
+                    text = stringResource(R.string.dismiss),
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 18.sp,
+                    color = Color.Red,
+                    modifier=Modifier.clickable(onClick = onDismissRequest),
+                )
+            },
+
+
+            )
+    }
+
+}
+
+@Composable
+fun DialogSelection(icon : Painter, text : String, onClick : () -> Unit = { }){
+    Row (horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 6.dp)){
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start,
+            modifier=Modifier.clickable(onClick = onClick)
+
+        ) {
+            Icon(
+                painter = icon,
+                contentDescription = null,
+                Modifier.width(24.dp),
+                tint = colorResource(id = R.color.main_blue))
+            Text(
+                text=text,
+                modifier=Modifier.padding(start = 4.dp),
+                fontWeight = FontWeight.Bold,
+                fontSize = 18.sp,
+                style = schedaBlue
+            )
+        }
+    }
+}
 @Preview(showBackground = true)
 @Composable
 fun GreetingPreview() {
