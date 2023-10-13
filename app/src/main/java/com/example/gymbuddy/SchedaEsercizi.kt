@@ -36,6 +36,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import com.example.gymbuddy.ui.theme.ButtonGrey
 import com.example.gymbuddy.ui.theme.MainBlue
 import com.example.gymbuddy.ui.theme.PlayGreen
@@ -43,20 +45,17 @@ import com.example.gymbuddy.ui.theme.ui.theme.GymBuddyTheme
 import com.example.gymbuddy.ui.theme.ui.theme.schedaBlue
 import com.example.gymbuddy.ui.theme.ui.theme.schedaTitle
 
-class SchedaEsercizi : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContent {
-            GymBuddyTheme {
-                // A surface container using the 'background' color from the theme
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
 
-                }
-            }
-        }
+@Composable
+fun SchedaEsercizi(navController: NavHostController ){
+    Column {
+        InfoScheda(
+            "Titolo",
+            "Descrizione lunga in cui scrivo cose incredibili, sta volta può essere piu lunga di prima, ma non troppo, altrimenti non va bene e non si vede bene, quindi non va bene"
+        )
+
+        LastTraining(data = "12/12/2021")
+        TextEsercizi()
     }
 }
 

@@ -2,31 +2,24 @@
 
 package com.example.gymbuddy
 
+
 import android.annotation.SuppressLint
-import android.icu.text.CaseMap.Title
-import android.media.Image
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-
-
 import androidx.compose.foundation.layout.Column
-
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-
-import androidx.compose.foundation.layout.fillMaxHeight
-
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -34,18 +27,18 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarColors
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -55,23 +48,24 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.layout.VerticalAlignmentLine
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.ReportFragment.Companion.reportFragment
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
 import com.example.gymbuddy.ui.theme.GymBuddyTheme
 import com.example.gymbuddy.ui.theme.ui.theme.schedaBlue
 import com.example.gymbuddy.ui.theme.ui.theme.schedaTitle
@@ -82,55 +76,136 @@ class MainActivity : ComponentActivity() {
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
+
+
         super.onCreate(savedInstanceState)
         setContent {
             GymBuddyTheme {
                 // A surface container using the 'background' color from the theme
                 //Create a scaffold with a top bar and a floating action button
                 var blurDialog by remember { mutableStateOf(0.dp) }
-                Scaffold (
-                    modifier= Modifier
-                        .fillMaxSize()
-                        .blur(blurDialog),
 
-                    topBar = {
-                        CenterAlignedTopAppBar(
-                            title = {
-                                    androidx.compose.foundation.Image(
-                                        painter = painterResource(id = R.drawable.logo_topbar),
-                                        contentDescription = null,
-                                        modifier= Modifier.height(50.dp)
-                                    )
-                            },
-                                colors = TopAppBarDefaults.mediumTopAppBarColors(
-                                    containerColor = colorResource(id = R.color.main_blue_dark),
-                                ),
-                            )
-                    },
-                    floatingActionButton = {
-                        AddButton(
-                            addBlur = { blurDialog = it }
-                        )
-                    },
-                    floatingActionButtonPosition = FabPosition.Center,
-                    content = { innerPadding ->
-                        Surface(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .padding(innerPadding), color = MaterialTheme.colorScheme.background)
-                        {
-                            Column (modifier=Modifier.verticalScroll(rememberScrollState())) {
-                                SchedaEsercizio(titolo = "Titolo 1", descrizione = "Allenamento per spalle e petto, distruzione assicurata poi scrivo cose a caso per testare sto robo e vediamo se taglia bene qujando arriva a 3 righe perchè ho messo cosi e mi iace", numeroEsercizi = 10)
-                                SchedaEsercizio(titolo = "Titolo 2", descrizione = "Allenamento per spalle e petto, distruzione assicurata poi scrivo cose a caso per testare sto robo e vediamo se taglia bene qujando arriva a 3 righe perchè ho messo cosi e mi iace", numeroEsercizi = 10)
-                                SchedaEsercizio(titolo = "Titolo 1", descrizione = "Allenamento per spalle e petto, distruzione assicurata poi scrivo cose a caso per testare sto robo e vediamo se taglia bene qujando arriva a 3 righe perchè ho messo cosi e mi iace", numeroEsercizi = 10)
-                                SchedaEsercizio(titolo = "Titolo 1", descrizione = "Allenamento per spalle e petto, distruzione assicurata poi scrivo cose a caso per testare sto robo e vediamo se taglia bene qujando arriva a 3 righe perchè ho messo cosi e mi iace", numeroEsercizi = 10)
+                GymBuddy()
 
-                            }
-                        }
-                    }
-                )
+
             }
         }
+    }
+}
+
+@Composable
+fun GymBuddy(
+    navController: NavHostController=rememberNavController()
+){
+    val backStackEntry by navController.currentBackStackEntryAsState()
+    val currentScreen = backStackEntry?.destination?.route ?: "GymBuddy"
+
+    var blurDialog by remember { mutableStateOf(0.dp) }
+
+    Scaffold (
+        modifier= Modifier
+            .fillMaxSize()
+            .blur(blurDialog),
+
+        topBar = {
+            TopAppBarFunction(
+                currentScreen = currentScreen,
+                canNavigateBack = navController.previousBackStackEntry != null,
+                navigateUp = { navController.navigateUp() },
+            )
+        },
+        floatingActionButton = {
+            AddButton(
+                addBlur = { blurDialog = it }
+            )
+        },
+        floatingActionButtonPosition = FabPosition.Center,
+        content = { innerPadding ->
+//            Surface(
+//                modifier = Modifier
+//                    .fillMaxSize()
+//                    .padding(innerPadding), color = MaterialTheme.colorScheme.background)
+//            {
+//                NavigationGraph(navController, innerPadding)
+//            }
+            NavigationGraph(navController, innerPadding)
+        }
+    )
+
+
+
+}
+
+@Composable
+fun TopAppBarFunction(
+    currentScreen: String,
+    canNavigateBack: Boolean,
+    navigateUp: () -> Unit,
+)
+{
+    CenterAlignedTopAppBar(
+        title = {
+            if (!canNavigateBack) {
+                androidx.compose.foundation.Image(
+                    painter = painterResource(id = R.drawable.logo_topbar),
+                    contentDescription = null,
+                    modifier = Modifier.height(50.dp)
+                )
+            }
+            else{
+                Text(
+                    text = currentScreen,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White
+                )
+            }
+        },
+        navigationIcon = {
+            //se si può navigare indietro (non home screen) allora appare la freccetta
+            if (canNavigateBack) {
+                IconButton(onClick = navigateUp) {
+                    Icon(
+                        imageVector = Icons.Filled.ArrowBack,
+                        tint=Color.White,
+                        contentDescription = "Back button"
+                    )
+                }
+            }
+        },
+        colors = TopAppBarDefaults.mediumTopAppBarColors(
+            containerColor = colorResource(id = R.color.main_blue_dark),
+        ),
+    )
+}
+
+@Composable
+private fun NavigationGraph(
+    navController: NavHostController,
+    innerPadding: PaddingValues,
+    modifier: Modifier = Modifier
+) {
+    NavHost(
+        navController = navController,
+        startDestination = "ListaSchede",
+        modifier= Modifier.padding(innerPadding)
+    ) {
+        composable("ListaSchede") {
+            ListaSchede(navController = navController)
+        }
+        composable("Scheda Esercizio") {
+            SchedaEsercizi( navController = navController)
+        }
+    }
+}
+
+@Composable
+fun ListaSchede(navController: NavController? = null, modifier: Modifier = Modifier){
+    Column (modifier=Modifier.verticalScroll(rememberScrollState())) {
+        SchedaEsercizio(titolo = "Titolo 1", descrizione = "Allenamento per spalle e petto, distruzione assicurata poi scrivo cose a caso per testare sto robo e vediamo se taglia bene qujando arriva a 3 righe perchè ho messo cosi e mi iace", numeroEsercizi = 10, navController=navController)
+        SchedaEsercizio(titolo = "Titolo 2", descrizione = "Allenamento per spalle e petto, distruzione assicurata poi scrivo cose a caso per testare sto robo e vediamo se taglia bene qujando arriva a 3 righe perchè ho messo cosi e mi iace", numeroEsercizi = 10, navController=navController)
+        SchedaEsercizio(titolo = "Titolo 1", descrizione = "Allenamento per spalle e petto, distruzione assicurata poi scrivo cose a caso per testare sto robo e vediamo se taglia bene qujando arriva a 3 righe perchè ho messo cosi e mi iace", numeroEsercizi = 10, navController=navController)
+        SchedaEsercizio(titolo = "Titolo 1", descrizione = "Allenamento per spalle e petto, distruzione assicurata poi scrivo cose a caso per testare sto robo e vediamo se taglia bene qujando arriva a 3 righe perchè ho messo cosi e mi iace", numeroEsercizi = 10, navController=navController)
+
     }
 }
 
@@ -157,8 +232,10 @@ fun AddButton(
     }
 }
 
+
+
 @Composable
-fun SchedaEsercizio(titolo: String = "Titolo", descrizione: String ="Nessuna descrizione", numeroEsercizi : Int =0, ultimoAllenamento : String="Non registrato"){
+fun SchedaEsercizio(titolo: String = "Titolo", descrizione: String ="Nessuna descrizione", numeroEsercizi : Int =0, ultimoAllenamento : String="Non registrato",navController : NavController? = null){
     Box(modifier = Modifier
         .padding(16.dp)
         .fillMaxWidth()){
@@ -169,6 +246,7 @@ fun SchedaEsercizio(titolo: String = "Titolo", descrizione: String ="Nessuna des
                 shape = RoundedCornerShape(8.dp)
             )
             .background(color = Color(0xFFF6F6F6))
+            .clickable { navController?.navigate("Scheda Esercizio") }
             ){
             Column (modifier=Modifier.padding(16.dp)){
 
