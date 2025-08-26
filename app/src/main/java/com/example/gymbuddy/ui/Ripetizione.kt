@@ -1,4 +1,4 @@
-package com.example.gymbuddy
+package com.example.gymbuddy.ui
 
 class Ripetizione (val tipologia : TipologiaEsercizio, val tempoRecupero: Int?, val numeroSerie: Int?, val peso : Float?) {
 
